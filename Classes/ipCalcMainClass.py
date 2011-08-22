@@ -2,6 +2,8 @@
 __author__ = 'laithzahid'
 __version__ = "0.1"
 
+
+
 class ipCalcMainClass(object):
     """
     This class is the main IPv4 address management and calculations.
@@ -107,14 +109,29 @@ class ipCalcMainClass(object):
             self.workingMaskInt[index] = int(self.workingMaskListSplit[index])
         # ----------------------------
 
-
+        self.representOutput(givenIP)
 
 
 # ---------------------Representation---------------------
 
 
-    def representOutput(self):
-        pass
+    def representOutput(self, givenIP):
+        print(givenIP)
+        print('->')
+        print('Address:   {:15}  -  {:35}'.format(self.ipIntCalc(), self.ipBinCalc()))
+        print('Netmask:   {:15}  -  {:35}'.format(self.workingMaskDotted, self.maskBinCalc()))
+        print('Wildcard:  {:15}  -  {:35}'.format(self.wildNetCalc()[0], self.wildNetCalc()[1]))
+        print('->')
+        print('Network:   {:15}  -  {:35}'.format(self.netCalc()[0], self.netCalc()[1]))
+        print('Broadcast: {:15}  -  {:35}'.format(self.broadcastCalc()[0], self.broadcastCalc()[1]))
+        print('->')
+        print('# of Hosts: {}  '.format(self.hostsCalc()[0], self.hostsCalc()[1]))
+        temp = self.rangeCalc()
+        print('1st Host:   {}'.format(temp[1]))
+        print('Last Host:  {}'.format(temp[2]))
+        print(temp[0])
+        print('Class: {}, Designation: {}'.format(self.getClass(), self.getDesignation()))
+
 
         
 
@@ -161,6 +178,9 @@ class ipCalcMainClass(object):
 
         elif test[0] == '0' and self.workingIP[0] == 10 and self.workingMask <= 8:
             self.ipDesignation = 'Internet Private Address - Supernetting'
+
+        elif test[0] == '0' and self.workingMask <= 8:
+            self.ipDesignation = 'Internet Public Address - Supernetting'
             
         elif test[0] == '0' and self.workingIP[0] == 127:
             self.ipDesignation = 'Local Host Address'
@@ -171,6 +191,9 @@ class ipCalcMainClass(object):
         elif test[:2] == '10' and self.workingIP[0] == 172 and self.workingIP[1] == 16 and self.workingMask <= 12:
             self.ipDesignation = 'Internet Private Address - Supernetting'
 
+        elif test[:2] == '10' and self.workingMask <= 16:
+            self.ipDesignation = 'Internet Public Address - Supernetting'
+
         elif test[:3] == '110' and self.workingIP[0] == 192 and self.workingIP[2] == 2 and self.workingMask == 24:
             self.ipDesignation =  'TEST-NET'
 
@@ -178,10 +201,13 @@ class ipCalcMainClass(object):
             self.ipDesignation =  'Internet Private Address'
 
         elif test[:3] == '110' and self.workingIP[0] == 192 and self.workingIP[1] == 168 and self.workingMask <= 16:
-            self.ipDesignation =  'Internet Private Address - Supernetting'
+                self.ipDesignation =  'Internet Private Address - Supernetting'
 
         elif test[:3] == '110' and self.workingIP[0] == 169 and self.workingIP[1] == 254 and self.workingMask == 16:
             self.ipDesignation =  'Link Local'
+
+        elif test[:3] == '110' and self.workingMask <= 24:
+            self.ipDesignation =  'Internet Public Address - Supernetting'
 
         elif test[:4] == '1110':
             self.ipDesignation = 'Multi-Cast'
@@ -190,7 +216,7 @@ class ipCalcMainClass(object):
             self.ipDesignation = 'Reserved'
 
         else:
-            self.ipDesignation = ''
+            self.ipDesignation = 'Internet Public Address'
 
         return self.ipDesignation
 
@@ -225,8 +251,8 @@ class ipCalcMainClass(object):
         2. Returns self.binMask as string in the form of b.b.b.b
         """
 
-        self.binMask = '{:08b}.{:08b}.{:08b}.{:08b}'.format(self.workingMaskListSplit[0], self.workingMaskListSplit[1],
-                                                            self.workingMaskListSplit[2], self.workingMaskListSplit[3])
+        self.binMask = '{:08b}.{:08b}.{:08b}.{:08b}'.format(self.workingMaskInt[0], self.workingMaskInt[1],
+                                                            self.workingMaskInt[2], self.workingMaskInt[3])
 
         return self.binMask
 
@@ -279,7 +305,7 @@ class ipCalcMainClass(object):
         self.netIDBin = '{:08b}.{:08b}.{:08b}.{:08b}'.format(self.netID[0], self.netID[1],
                                                              self.netID[2], self.netID[3])
         
-        return self.netID
+        return self.netIDInt, self.netIDBin
 
     def wildNetCalc(self):
         """
@@ -300,7 +326,7 @@ class ipCalcMainClass(object):
         self.wildNetBin = '{:08b}.{:08b}.{:08b}.{:08b}'.format(self.wildNet[0], self.wildNet[1],
                                                                self.wildNet[2], self.wildNet[3])
 
-        return self.wildNet
+        return self.wildNetInt, self.wildNetBin
 
     def broadcastCalc(self):
         """
@@ -311,16 +337,16 @@ class ipCalcMainClass(object):
         """
 
         self.broadcast = [0, 0, 0, 0]
-        test = self.wildNetCalc()
-        for index in range(len(self.workingMask)):
-            self.broadcast[index] = self.workingIP[index] | test[index]
+        self.wildNetCalc()
+        for index in range(len(self.workingMaskInt)):
+            self.broadcast[index] = self.workingIP[index] | self.wildNet[index]
 
         self.broadcastInt = '{}.{}.{}.{}'.format(self.broadcast[0], self.broadcast[1],
                                                  self.broadcast[2], self.broadcast[3])
         self.broadcastBin = '{:08b}.{:08b}.{:08b}.{:08b}'.format(self.broadcast[0], self.broadcast[1],
                                                                  self.broadcast[2], self.broadcast[3])
         
-        return self.broadcast
+        return self.broadcastInt, self.broadcastBin
     
 
     def rangeCalc(self):
@@ -332,29 +358,30 @@ class ipCalcMainClass(object):
         3. Returns the first and last IP addresses in the range in the format of '{} - {}' - str
         """
 
-        if self.workingMask == '32':
-            return 'Host route - Single host'
+        self.firstIP = self.netID
+        self.firstIP[3] += 1
+
+        self.lastIP = self.broadcast
+        self.lastIP[3] -= 1
+
+
+        self.firstIPInt = '{}.{}.{}.{}'.format(self.firstIP[0], self.firstIP[1],
+                                               self.firstIP[2], self.firstIP[3])
+        self.lastIPInt = '{}.{}.{}.{}'.format(self.lastIP[0], self.lastIP[1],
+                                              self.lastIP[2], self.lastIP[3])
+
+
+        if self.workingMask == 32:
+            host_route = 'Host route - Single host'
+            return host_route, self.ipIntCalc(), 'None'
             # Host route - One host, e.g. 192.168.1.1/255.255.255.255
-        elif self.workingMask == '31':
+        elif self.workingMask == 31:
             # Point to Point (RFC 3021) - Two IPs - Should return netID and BroadcastID
-            return 'Point to Point (RFC 3021) - Two IP addresses, only valid if zero-subnet is enabled'
-#            print(self.netIDInt, '  -  ', self.broadcastInt)
+            point_to_point = 'Point to Point (RFC 3021) - Two IP addresses, only valid if zero-subnet is enabled'
+            return point_to_point, self.netIDInt, self.broadcastInt
         else:
             # A typical IP address range
-            self.firstIP = self.netCalc()
-            self.firstIP[3] += 1
-
-            self.lastIP = self.broadcastCalc()
-            self.lastIP[3] -= 1
-
-            self.firstIPInt = '{}.{}.{}.{}'.format(self.firstIP[0], self.firstIP[1],
-                                                   self.firstIP[2], self.firstIP[3])
-            self.lastIPInt = '{}.{}.{}.{}'.format(self.lastIP[0], self.lastIP[1],
-                                                  self.lastIP[2], self.lastIP[3])
-
-#            print('First IP', '       -  ', 'Last IP')
-#            print(self.firstIPInt, '  -  ', self.lastIPInt)
-            return '{} - {}'.format(self.firstIPInt, self.lastIPInt)
+            return '', self.firstIPInt, self.lastIPInt
 
 
 
@@ -367,17 +394,17 @@ class ipCalcMainClass(object):
         self.hostsBits = 32 - self.workingMask
         self.hosts = (2 ** self.hostsBits) - 2
 
-        if self.workingMask == '32':
+        if self.workingMask == 32:
             # Host route - One host, e.g. 192.168.1.1/255.255.255.255
-            return self.hostsBits
+            return 1, 0
 
-        elif self.workingMask == '31':
+        elif self.workingMask == 31:
             # Point to Point (RFC 3021) - Two IPs
-            return self.hostsBits
+            return 2, 1
 
-        else:
+        if self.workingMask <= 30:
             # A typical IP address range
-            return self.hostsBits, self.hosts
+            return self.hosts, self.hostsBits
 
 
 
