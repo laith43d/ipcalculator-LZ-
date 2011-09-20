@@ -33,6 +33,8 @@ def main():
         givenIP = sys.argv[1]
         try:
             ipAddress = ip(givenIP)
+            # TODO Optimize the code further, make all calculations outside, and pass arguments to functions.
+            # ipAddress.representOutput(givenIP)
 
         except (IndexError, ValueError):
             if givenIP == 'x' or givenIP == 'X': sys.exit()

@@ -110,7 +110,7 @@ class ipCalcMainClass(object):
         # ----------------------------
 
         self.representOutput(givenIP)
-
+        return None
 
 # ---------------------Representation---------------------
 
@@ -120,18 +120,20 @@ class ipCalcMainClass(object):
         print('->')
         print('Address:   {:15}  -  {:35}'.format(self.ipIntCalc(), self.ipBinCalc()))
         print('Netmask:   {:15}  -  {:35}'.format(self.workingMaskDotted, self.maskBinCalc()))
-        print('Wildcard:  {:15}  -  {:35}'.format(self.wildNetCalc()[0], self.wildNetCalc()[1]))
+        print('Wildcard:  {:15}  -  {:35}'.format(self.wildNetCalcInt(), self.wildNetCalcBin()))
         print('->')
-        print('Network:   {:15}  -  {:35}'.format(self.netCalc()[0], self.netCalc()[1]))
-        print('Broadcast: {:15}  -  {:35}'.format(self.broadcastCalc()[0], self.broadcastCalc()[1]))
+        print('Network:   {:15}  -  {:35}'.format(self.netCalcInt(), self.netCalcBin()))
+        print('Broadcast: {:15}  -  {:35}'.format(self.broadcastCalcInt(), self.broadcastCalcBin()))
         print('->')
         print('# of Hosts: {}  '.format(self.hostsCalc()[0], self.hostsCalc()[1]))
+        # Assigned it like that to avoid calculating the returned values multiple times.
         temp = self.rangeCalc()
         print('1st Host:   {}'.format(temp[1]))
         print('Last Host:  {}'.format(temp[2]))
         print(temp[0])
         print('Class: {}, Designation: {}'.format(self.getClass(), self.getDesignation()))
-
+        print('Finished')
+        
 
         
 
@@ -288,12 +290,11 @@ class ipCalcMainClass(object):
 # ------------------- Calculation -----------------------
 
 
-    def netCalc(self):
+    def netCalcInt(self):
         """
         1. Calculates the net ID of the given IP address, by ANDing the corresponding value of self.workingIP and self.workignMaskInt
         2. Returns self.netID as list in the form of [d, d, d, d]
         3. Stores the form of d.d.d.d as string in self.netIDInt
-        4. Stores the form of b.b.b.b as string in self.netIDBin
         """
         self.netID = [0, 0, 0, 0]
 
@@ -302,17 +303,31 @@ class ipCalcMainClass(object):
 
         self.netIDInt = "{}.{}.{}.{}".format(self.netID[0], self.netID[1],
                                              self.netID[2], self.netID[3])
+
+        return self.netIDInt
+
+
+    def netCalcBin(self):
+        """
+        1. Calculates the net ID of the given IP address, by ANDing the corresponding value of self.workingIP and self.workignMaskInt
+        2. Returns self.netID as list in the form of [d, d, d, d]
+        3. Stores the form of b.b.b.b as string in self.netIDBin
+        """
+        self.netID = [0, 0, 0, 0]
+
+        for index in range(len(self.workingIP)):
+            self.netID[index] = self.workingIP[index] & self.workingMaskInt[index]
+
         self.netIDBin = '{:08b}.{:08b}.{:08b}.{:08b}'.format(self.netID[0], self.netID[1],
                                                              self.netID[2], self.netID[3])
-        
-        return self.netIDInt, self.netIDBin
 
-    def wildNetCalc(self):
+        return self.netIDBin
+
+    def wildNetCalcInt(self):
         """
         1. Calculates the wild net ID of the given IP address, by subtracting the corresponding value of self.workingMaskInt from 255
         2. Returns self.wildNet as list in the form of [d, d, d, d]
         3. Stores the form of d.d.d.d as string in self.wildNetInt
-        4. Stores the form of b.b.b.b as string in self.wildNetBin
         """
 
         self.wildNet = [0, 0, 0, 0]
@@ -323,37 +338,66 @@ class ipCalcMainClass(object):
 
         self.wildNetInt = '{}.{}.{}.{}'.format(self.wildNet[0], self.wildNet[1], self.wildNet[2],
                                                self.wildNet[3])
+
+        return self.wildNetInt
+
+    def wildNetCalcBin(self):
+        """
+        1. Calculates the wild net ID of the given IP address, by subtracting the corresponding value of self.workingMaskInt from 255
+        2. Returns self.wildNet as list in the form of [d, d, d, d]
+        3. Stores the form of b.b.b.b as string in self.wildNetBin
+        """
+
+        self.wildNet = [0, 0, 0, 0]
+
+        for index in range(len(self.workingMaskInt)):
+            self.wildNet[index] = 255 - self.workingMaskInt[index]
+#            self.wildnet[index] = 255 ^ self.workingMaskInt[index]
+
         self.wildNetBin = '{:08b}.{:08b}.{:08b}.{:08b}'.format(self.wildNet[0], self.wildNet[1],
                                                                self.wildNet[2], self.wildNet[3])
 
-        return self.wildNetInt, self.wildNetBin
+        return self.wildNetBin
 
-    def broadcastCalc(self):
+    def broadcastCalcInt(self):
         """
         1. Calculates the broadcast address, by ORing the corresponding value of self.workingIP with self.wildNet
         2. Returns self.broadcast as list in the form of [d, d, d, d]
         3. Stores the form of d.d.d.d as string in self.broadcastInt
-        4. Stores the form of b.b.b.b as string in self.broadcastBin
         """
 
         self.broadcast = [0, 0, 0, 0]
-        self.wildNetCalc()
+        self.wildNetCalcInt()
         for index in range(len(self.workingMaskInt)):
             self.broadcast[index] = self.workingIP[index] | self.wildNet[index]
 
         self.broadcastInt = '{}.{}.{}.{}'.format(self.broadcast[0], self.broadcast[1],
                                                  self.broadcast[2], self.broadcast[3])
+
+        return self.broadcastInt
+
+    def broadcastCalcBin(self):
+        """
+        1. Calculates the broadcast address, by ORing the corresponding value of self.workingIP with self.wildNet
+        2. Returns self.broadcast as list in the form of [d, d, d, d]
+        3. Stores the form of b.b.b.b as string in self.broadcastBin
+        """
+
+        self.broadcast = [0, 0, 0, 0]
+        self.wildNetCalcInt()
+        for index in range(len(self.workingMaskInt)):
+            self.broadcast[index] = self.workingIP[index] | self.wildNet[index]
+
         self.broadcastBin = '{:08b}.{:08b}.{:08b}.{:08b}'.format(self.broadcast[0], self.broadcast[1],
                                                                  self.broadcast[2], self.broadcast[3])
-        
-        return self.broadcastInt, self.broadcastBin
-    
+
+        return self.broadcastBin
 
     def rangeCalc(self):
         """
         1. Check if the IP given is host IP or P2P.
         2. Otherwise, it calculates the first and last IP address in the range:
-                        self.firstIP = self.netCalc() + 1
+                        self.firstIP = self.netCalcInt() + 1
                         self.lastIP = self.broadcastCalc() - 1
         3. Returns the first and last IP addresses in the range in the format of '{} - {}' - str
         """
