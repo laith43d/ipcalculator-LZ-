@@ -1,3 +1,4 @@
+import repoze.lru
 
 __author__ = 'laithzahid'
 __version__ = "0.1"
@@ -109,8 +110,6 @@ class ipCalcMainClass(object):
             self.workingMaskInt[index] = int(self.workingMaskListSplit[index])
         # ----------------------------
 
-        self.representOutput(givenIP)
-        return None
 
 # ---------------------Representation---------------------
 

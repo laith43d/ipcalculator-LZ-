@@ -20,6 +20,7 @@ def main():
         givenIP = input('\nPlease give an IP address (IP/MASK), (to exit type "X"): ')
         try:
             ipAddress = ip(givenIP)
+            ipAddress.representOutput(givenIP)
 
         except (IndexError, ValueError):
             if givenIP == 'x' or givenIP == 'X': sys.exit()
@@ -27,25 +28,25 @@ def main():
                 print('\nPlease give a valid IPv4/MASK address in #.#.#.#/# format,' '\n'
                 '\tfor example: 192.168.1.1/24, or 10.10.10.1/28')
                 main()
-    elif len(sys.argv) > 2:
-        print("This version accepts only one IP address")
     else:
+#        len(sys.argv) > 2
+        print("This version accepts only one IP address, processing the first give IP - \n")
+#    else:
         givenIP = sys.argv[1]
         try:
             ipAddress = ip(givenIP)
+            ipAddress.representOutput(givenIP)
+
             # TODO Optimize the code further, make all calculations outside, and pass arguments to functions.
-            # ipAddress.representOutput(givenIP)
 
         except (IndexError, ValueError):
             if givenIP == 'x' or givenIP == 'X': sys.exit()
             else:
                 print('\nPlease give a valid IPv4/MASK address in #.#.#.#/# format,' '\n'
                 '\tfor example: 192.168.1.1/24, or 10.10.10.1/28')
-                
 
 
 # Run the main application function, input format is: IP/MASK, IP is given in dotted decimal, MASK is given in prefix notation.
 
 if __name__ == '__main__':
     main()
-  
