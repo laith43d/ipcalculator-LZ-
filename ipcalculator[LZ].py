@@ -23,7 +23,7 @@ def main():
             ipAddress.representOutput(givenIP)
 
         except (IndexError, ValueError):
-            if givenIP == 'x' or givenIP == 'X': sys.exit()
+            if givenIP in ['x', 'X']: sys.exit()
             else:
                 print('\nPlease give a valid IPv4/MASK address in #.#.#.#/# format,' '\n'
                 '\tfor example: 192.168.1.1/24, or 10.10.10.1/28')
@@ -40,7 +40,7 @@ def main():
             # TODO Optimize the code further, make all calculations outside, and pass arguments to functions.
 
         except (IndexError, ValueError):
-            if givenIP == 'x' or givenIP == 'X': sys.exit()
+            if givenIP in ['x', 'X']: sys.exit()
             else:
                 print('\nPlease give a valid IPv4/MASK address in #.#.#.#/# format,' '\n'
                 '\tfor example: 192.168.1.1/24, or 10.10.10.1/28')
