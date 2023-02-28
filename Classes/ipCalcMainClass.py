@@ -78,7 +78,7 @@ class ipCalcMainClass(object):
         # To check if character is given instead of integer, and convert to integer
         # To check if segment is greater than 255
         # To check if more than 4 segments are given
-        
+
         for index in range(len(self.splitIP)):
             self.workingIP[index] = int(self.splitIP[index])
             if self.workingIP[index] > 255: raise ValueError
@@ -93,9 +93,9 @@ class ipCalcMainClass(object):
             test = self.getClass()
             if test == 'A':
                 self.workingMask = 8
-            if test == 'B':
+            elif test == 'B':
                 self.workingMask = 16
-            if test == 'C':
+            elif test == 'C':
                 self.workingMask = 24
             if test == 'D':
                 print('Multicast Address, using /24')
@@ -124,13 +124,13 @@ class ipCalcMainClass(object):
         print('Network:   {:15}  -  {:35}'.format(self.netCalcInt(), self.netCalcBin()))
         print('Broadcast: {:15}  -  {:35}'.format(self.broadcastCalcInt(), self.broadcastCalcBin()))
         print('->')
-        print('# of Hosts: {}  '.format(self.hostsCalc()[0], self.hostsCalc()[1]))
+        print(f'# of Hosts: {self.hostsCalc()[0]}  ')
         # Assigned it like that to avoid calculating the returned values multiple times.
         temp = self.rangeCalc()
-        print('1st Host:   {}'.format(temp[1]))
-        print('Last Host:  {}'.format(temp[2]))
+        print(f'1st Host:   {temp[1]}')
+        print(f'Last Host:  {temp[2]}')
         print(temp[0])
-        print('Class: {}, Designation: {}'.format(self.getClass(), self.getDesignation()))
+        print(f'Class: {self.getClass()}, Designation: {self.getDesignation()}')
         print('Finished')
         
 
@@ -229,8 +229,7 @@ class ipCalcMainClass(object):
         2. Returns self.intIP as string in the form of d.d.d.d
         """
 
-        self.intIP = '{}.{}.{}.{}'.format(self.workingIP[0], self.workingIP[1],
-                                          self.workingIP[2], self.workingIP[3])
+        self.intIP = f'{self.workingIP[0]}.{self.workingIP[1]}.{self.workingIP[2]}.{self.workingIP[3]}'
 
         return self.intIP
 
@@ -300,8 +299,9 @@ class ipCalcMainClass(object):
         for index in range(len(self.workingIP)):
             self.netID[index] = self.workingIP[index] & self.workingMaskInt[index]
 
-        self.netIDInt = "{}.{}.{}.{}".format(self.netID[0], self.netID[1],
-                                             self.netID[2], self.netID[3])
+        self.netIDInt = (
+            f"{self.netID[0]}.{self.netID[1]}.{self.netID[2]}.{self.netID[3]}"
+        )
 
         return self.netIDInt
 
@@ -335,8 +335,7 @@ class ipCalcMainClass(object):
             self.wildNet[index] = 255 - self.workingMaskInt[index]
 #            self.wildnet[index] = 255 ^ self.workingMaskInt[index]
 
-        self.wildNetInt = '{}.{}.{}.{}'.format(self.wildNet[0], self.wildNet[1], self.wildNet[2],
-                                               self.wildNet[3])
+        self.wildNetInt = f'{self.wildNet[0]}.{self.wildNet[1]}.{self.wildNet[2]}.{self.wildNet[3]}'
 
         return self.wildNetInt
 
@@ -370,8 +369,7 @@ class ipCalcMainClass(object):
         for index in range(len(self.workingMaskInt)):
             self.broadcast[index] = self.workingIP[index] | self.wildNet[index]
 
-        self.broadcastInt = '{}.{}.{}.{}'.format(self.broadcast[0], self.broadcast[1],
-                                                 self.broadcast[2], self.broadcast[3])
+        self.broadcastInt = f'{self.broadcast[0]}.{self.broadcast[1]}.{self.broadcast[2]}.{self.broadcast[3]}'
 
         return self.broadcastInt
 
@@ -408,10 +406,10 @@ class ipCalcMainClass(object):
         self.lastIP[3] -= 1
 
 
-        self.firstIPInt = '{}.{}.{}.{}'.format(self.firstIP[0], self.firstIP[1],
-                                               self.firstIP[2], self.firstIP[3])
-        self.lastIPInt = '{}.{}.{}.{}'.format(self.lastIP[0], self.lastIP[1],
-                                              self.lastIP[2], self.lastIP[3])
+        self.firstIPInt = f'{self.firstIP[0]}.{self.firstIP[1]}.{self.firstIP[2]}.{self.firstIP[3]}'
+        self.lastIPInt = (
+            f'{self.lastIP[0]}.{self.lastIP[1]}.{self.lastIP[2]}.{self.lastIP[3]}'
+        )
 
 
         if self.workingMask == 32:
